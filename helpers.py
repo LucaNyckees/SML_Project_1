@@ -111,15 +111,16 @@ l=2
 u=2
 y = [1,0,0,1]
 
-#this one does not work yet
 def harmonic_solution(X,y,l,u):
+    
+    W_b = weight_in_blocks(X,l,u)
     
     f_labeled = []
     for i in range(l):
         f_labeled.append(y[i])
     
-    temp = np.linalg.solve(diagonal_in_blocks(X,l,u)[0]-weight_in_blocks(X,l,u)[0],np.eye(u)) 
-    f_unlabeled = temp * weight_matrix(X)[2] * f_labeled
+    temp = np.linalg.solve(diagonal_in_blocks(X,l,u)[0]-W_b[0],np.eye(u)) 
+    f_unlabeled = temp * W_b[2] * f_labeled
     
     return f_labeled, f_unlabeled
 
