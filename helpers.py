@@ -124,8 +124,38 @@ def harmonic_solution(X,y,l,u):
     
     return f_labeled, f_unlabeled
 
+# sélectionne l data au hasard dans X et créé un nouveau X et f avec d'abord les données
+# labeled puis les données unlabeled. f_unlabeled est mis à 0
+def create_sample(X,f,N,l,u):
+    X_spl = X
+    f_spl = np.zeros(N)
+    unlabeled = 1
+    spl = rd.sample(range(N), l)
+    #remplir la partie labeled de X_spl
+    for j in range(l):
+        X_spl[j] = X[spl[j]]
+        f_spl[j] = f[spl[j]]
+    #remplr la partie unlabeled de X_spl
+    for j in range(u):
+        # est-ce que l'indice j correspond à un labeled data ?
+        for k in range(l):
+            if j==spl[k]:
+                unlabeled = 0
+        # Si j n'est pas un labeled data, alors ajouter la data à X_spl
+        if unlabeled == 1:
+            X_spl[l+j] = X[j]
+        unlabeled = 1
+    return X_spl, f_spl
 
-    
+# Classification des images unlabeled en fonction du f calculé
+def classifier(f_unlabeled,q):
+    S = sum(f_unlabeled)
+    u = len(f_unlabeled)
+    f_u_classified = np.zeros(u)
+    for i in range(u):
+        if q*f_unlabeled[i]/S > (1-q)*(1-f_unlabeled[i])/S:
+            f_u_classified[i] = 1
+    return f_u_classified
     
     
     
