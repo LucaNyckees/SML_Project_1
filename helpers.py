@@ -1,4 +1,5 @@
 import numpy as np
+import random as rd
 
 def single_weight(X, i, j):
     
@@ -114,40 +115,42 @@ y = [1,0,0,1]
 def harmonic_solution(X,y,l,u):
     
     W_b = weight_in_blocks(X,l,u)
-    
     f_labeled = []
     for i in range(l):
         f_labeled.append(y[i])
-    
-    temp = np.linalg.solve(diagonal_in_blocks(X,l,u)[0]-W_b[0],np.eye(u)) 
-    f_unlabeled = temp * W_b[2] * f_labeled
-    
+    temp = np.linalg.solve(diagonal_in_blocks(X,l,u)[3]-W_b[3],np.eye(u)) 
+    f_unlabeled = np.matmul(np.matmul(temp,W_b[2]), f_labeled)
     return f_labeled, f_unlabeled
 
-# sélectionne l data au hasard dans X et créé un nouveau X et f avec d'abord les données
-# labeled puis les données unlabeled. f_unlabeled est mis à 0
-def create_sample(X,f,N,l,u):
-    X_spl = X
-    f_spl = np.zeros(N)
+def create_sample(X,f,N,l,u,p):
+    X_spl = np.zeros((N,p))
+    f_spl = []
+    #f_spl = np.zeros(N)
     unlabeled = 1
+    increment = 0
     spl = rd.sample(range(N), l)
+    while(f[spl[0]] == f[spl[1]]):
+        spl = rd.sample(range(N), l)
+    
     #remplir la partie labeled de X_spl
     for j in range(l):
         X_spl[j] = X[spl[j]]
-        f_spl[j] = f[spl[j]]
-    #remplr la partie unlabeled de X_spl
-    for j in range(u):
+        f_spl.append(f[spl[j]])
+        
+    #remplir la partie unlabeled de X_spl
+    for j in range(N):
         # est-ce que l'indice j correspond à un labeled data ?
         for k in range(l):
-            if j==spl[k]:
+            if (j)==spl[k]:
                 unlabeled = 0
+                increment += 1
         # Si j n'est pas un labeled data, alors ajouter la data à X_spl
         if unlabeled == 1:
-            X_spl[l+j] = X[j]
+            X_spl[l+j-increment] = X[j]
+            f_spl.append(f[j])
         unlabeled = 1
     return X_spl, f_spl
 
-# Classification des images unlabeled en fonction du f calculé
 def classifier(f_unlabeled,q):
     S = sum(f_unlabeled)
     u = len(f_unlabeled)
