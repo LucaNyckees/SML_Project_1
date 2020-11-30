@@ -125,12 +125,21 @@ def harmonic_solution(X,y,l,u):
 def create_sample(X,f,N,l,u,p):
     X_spl = np.zeros((N,p))
     f_spl = []
-    #f_spl = np.zeros(N)
+    
+    # call the random function to choose the
+    # labeled data and check if all labeled
+    # data have not the same label
+    uniform = 1
+    while uniform == 1 :
+        i = 0
+        spl = rd.sample(range(N), l)
+        while (i < l):
+            if (f[spl[i]]!=f[spl[0]]):
+                uniform = 0
+            i+=1
+    
     unlabeled = 1
     increment = 0
-    spl = rd.sample(range(N), l)
-    while(f[spl[0]] == f[spl[1]]):
-        spl = rd.sample(range(N), l)
     
     #remplir la partie labeled de X_spl
     for j in range(l):
