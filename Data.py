@@ -26,15 +26,6 @@ def GenerateData(k,l,number):
 
     return Data
 
-def TransformData(data):
-
-    Transformed_Data = []
-    for i in range(0, len(data)):
-            local = list(itertools.chain(*data[i]))
-            Transformed_Data.append(local)
-
-    return Transformed_Data
-
 
 def GenerateLabeledData(type, number):
 
@@ -77,6 +68,16 @@ def DisplayData(data):
        plt.imshow(img, cmap=plt.cm.binary)
 
    plt.show()
+
+
+def TransformData(data):
+
+    Transformed_Data = []
+    for i in range(0, len(data)):
+            local = list(itertools.chain(*data[i]))
+            Transformed_Data.append(local)
+
+    return Transformed_Data
 
 
 def ResizeData(size, data):
