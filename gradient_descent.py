@@ -4,7 +4,7 @@ from magic_helpers import *
 
 def partial_deriv_w(X,i,j,sigma,d):
     
-    W = weight_matrix(X)
+    W = weight_matrix(X,sigma)
     temp = 2* W[i,j] * (X[i,d]-X[j,d])**2
     power = sigma[d]**3
     return temp / power
@@ -13,8 +13,8 @@ def partial_deriv_w(X,i,j,sigma,d):
 #quantity in expression (14)
 def partial_deriv_p(X,i,j,sigma,d):
     
-    W = weight_matrix(X)
-    P = P_matrix(X)
+    W = weight_matrix(X,sigma)
+    P = P_matrix(X,sigma)
     n = X.shape[0]
     S = 0
     Sum = 0
@@ -51,7 +51,7 @@ def partial_deriv_P_tilde_in_blocks(X,sigma,d,eps,l,u):
 #quantity in expression (13)
 def derivative_vector(X,y,f,l,u,sigma,d,eps):
     
-    P = smoothed_P_matrix_in_blocks(X, eps)
+    P = smoothed_P_matrix_in_blocks(X, eps, sigma)
     temp = np.linalg.solve(np.eye(u)-P[3],np.eye(u)) 
     a = np.matmul(partial_deriv_P_tilde_in_blocks(X,sigma,d,eps,l,u)[3],unlabeled_part(f,l,u))
     b = np.matmul(partial_deriv_P_tilde_in_blocks(X,sigma,d,eps,l,u)[2],labeled_part(f,l,u))
@@ -71,7 +71,6 @@ def compute_deriv(X,y,f,l,u,sigma,d,eps):
     
 
 #quantities in expression (12) reunited in a vector
-#i.e. computing the gradient of expression (11)
 def compute_gradient(X,y,f,l,u,sigma,eps):
     
     m = X.shape[1]
@@ -88,8 +87,8 @@ X = np.array([[1,1,1,1,1],[2,2,2,2,2],[3,3,3,3,3],[4,4,4,4,4]])
 l=2
 u=2
 y = [1,0,0,1]
-f1 = harmonic_solution(X,y,l,u)[0]
-f2 = harmonic_solution(X,y,l,u)[1]
+f1 = harmonic_solution(X,y,l,u,sigma)[0]
+f2 = harmonic_solution(X,y,l,u,sigma)[1]
 f = np.hstack((f1,f2))
 sigma = []
 for i in range(X.shape[1]):
@@ -100,7 +99,7 @@ for i in range(X.shape[1]):
 #print(partial_deriv_P_tilde(X,sigma,2,eps=0.1))
 print(compute_gradient(X,y,f,l,u,sigma,eps=0.1))
 
-#gradient descent algorithm implementation
+
 def gradient_descent(X,y,initial_sigma,max_iters,gamma,f,l,u,eps):
     
     sigma = initial_sigma
