@@ -1,20 +1,21 @@
 import numpy as np
 import random as rd
 
-def single_weight(X, i, j):
+def single_weight(X, i, j, sigma):
     
     # if X has size n x m
     L = []
     m = X.shape[1]
     for d in range(m):
-        L.append((X[i,d]-X[j,d])**2)
+        big_number = sigma[d]**2
+        L.append((X[i,d]-X[j,d])**2/big_number)
     S = np.sum(L)
     E = np.exp(-S)
     
     return E
 
 
-def weight_matrix(X):
+def weight_matrix(X, sigma):
 
     n = X.shape[0]
     W = np.zeros((n,n))
@@ -115,9 +116,11 @@ y = [1,0,0,1]
 def harmonic_solution(X,y,l,u):
     
     W_b = weight_in_blocks(X,l,u)
+   
     f_labeled = []
     for i in range(l):
         f_labeled.append(y[i])
+    
     temp = np.linalg.solve(diagonal_in_blocks(X,l,u)[3]-W_b[3],np.eye(u)) 
     f_unlabeled = np.matmul(np.matmul(temp,W_b[2]), f_labeled)
     return f_labeled, f_unlabeled
@@ -168,26 +171,3 @@ def classifier(f_unlabeled,q):
         if q*f_unlabeled[i]/S > (1-q)*(1-f_unlabeled[i])/S:
             f_u_classified[i] = 1
     return f_u_classified
-    
-    
-    
-    
-
-    
-    
-    
-    
-
-
-    
-    
-    
-
-
-
-
-
-    
-
-
-
