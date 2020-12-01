@@ -1,41 +1,51 @@
-# -*- coding: utf-8 -*-
-"""
-Created on Thu Nov 26 17:59:02 2020
+import tensorflow as tf
+import itertools
+from magic_helpers import *
+import numpy as np
+from sklearn.metrics import accuracy_score
+from Data import *
 
-@author: Julia Bierent
-"""
-X = np.array([[255,1,1,2,1,1,1,2,2,2,1,1,1,1,2,2],
-             [3,1,3,3,1,1,1,3,3,3,1,3,1,1,3,1],
-             [3,1,3,3.1,1,1,1,3,3,3,1,3,1,1,3,1],
-             [255,1,1,2,1,1,1,2,2,2,1,1,1,1,2,2.1],
-             [3,1,3,3,1,1,1,3.1,3,3,1,3,1,1,3,1],
-             [255,1,1,2,1,1,1,2,2,2,1,1,1.1,1,2,2],
-             [3,1,3,3,1,1,1.1,3,3,3,1,3,1,1,3,1],
-             [3,1,3,3,1,1,1,3,3,3,1,3,1,1,3,1],
-             [255,1,1,2,1,1,1,2,2,2,1,1.1,1,1,2,2],
-             [3,1,3,3,1,1,1,3,3,3,1,3,1,1.1,3,1]])
+ok=GenerateData(1,2,100)
+"""print(ok[0])
+print(ok[1])
+print(len(ok[0]))
+print(len(ok[1]))"""
 
-f = np.array((1,0,0,1,0,1,0,0,1,0))
-# number of samples to create
-S = 5
-# number of data
-N = 10
+(X, f) = ok
+for i in range(len(f)):
+    f[i]-=1
+    
+X = np.array(X)
+
+# number of samples
+S = 1
+# number of data points (i.e. images)
+N = 100
 # number of pixels for each data
-p = 16
-# number of labeled data
-l = 2
+p = 784
+# number of labeled data (>=2)
+l = 10
 # number of unlabeled data
 u = N-l
-q = f.sum()/N
+q = np.sum(f)/N
 X_spl = np.zeros((S,N,p))
 f_spl = np.zeros((S,N))
 f_spl_labeled = np.zeros((S,l))
 f_spl_unlabeled = np.zeros((S,u))
 f_u_classified = np.zeros((S,u))
 
-for i in range(S):
-    (X_spl[i], f_spl[i]) = helpers.create_sample(X,f,N,l,u,p)
-    (f_spl_labeled[i], f_spl_unlabeled[i]) = helpers.harmonic_solution(X_spl[i], f_spl[i], l, u)
-    f_u_classified[i] = helpers.classifier(f_spl_unlabeled[i],q) 
 
-    
+"""#print(f)
+W_b = weight_in_blocks(X, l, u)
+temp = diagonal_in_blocks(X,l,u)[3]-W_b[3]#D_uu-W_uu
+print(temp)"""
+f_predicted = np.zeros((S,N))
+
+for i in range(S):
+    (X_spl[i], f_spl[i]) = create_sample(X,f,N,l,u,p)
+    (f_spl_labeled[i], f_spl_unlabeled[i]) = harmonic_solution(X_spl[i], f_spl[i], l, u)
+    f_u_classified[i] = classifier(f_spl_unlabeled[i],q)
+    f_predicted[i] = np.concatenate((f_spl_labeled[i],f_u_classified[i]))
+    print(f_predicted[i])
+    print(f_spl[i])
+print(accuracy_score(f_spl[0], f_predicted[0]))
