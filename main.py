@@ -17,6 +17,11 @@ for i in range(len(f)):
     
 X = np.array(X)
 
+#hyperparameter
+sigma = []
+for i in range(X.shape[1]):
+    sigma.append(380)
+for i in range()
 # number of samples
 S = 1
 # number of data points (i.e. images)
@@ -43,7 +48,7 @@ f_predicted = np.zeros((S,N))
 
 for i in range(S):
     (X_spl[i], f_spl[i]) = create_sample(X,f,N,l,u,p)
-    (f_spl_labeled[i], f_spl_unlabeled[i]) = harmonic_solution(X_spl[i], f_spl[i], l, u)
+    (f_spl_labeled[i], f_spl_unlabeled[i]) = harmonic_solution(X_spl[i], f_spl[i], l, u, sigma)
     f_u_classified[i] = classifier(f_spl_unlabeled[i],q)
     f_predicted[i] = np.concatenate((f_spl_labeled[i],f_u_classified[i]))
     print(f_predicted[i])
