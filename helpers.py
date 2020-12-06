@@ -1,3 +1,4 @@
+
 import numpy as np
 import random as rd
 
@@ -7,8 +8,7 @@ def single_weight(X, i, j, sigma):
     L = []
     m = X.shape[1]
     for d in range(m):
-        big_number = sigma[d]**2
-        L.append((X[i,d]-X[j,d])**2/big_number)
+        L.append((X[i,d]-X[j,d])**2/sigma[d]**2)
     S = np.sum(L)
     E = np.exp(-S)
     
@@ -21,16 +21,16 @@ def weight_matrix(X, sigma):
     W = np.zeros((n,n))
     for i in range(n):
         for j in range(n):
-            W[i,j] = single_weight(X, i, j)
+            W[i,j] = single_weight(X, i, j, sigma)
             
     return W
 
-def quadratic_energy(X, f):
+def quadratic_energy(X, f, sigma):
     
     L = []
     n = X.shape[0]
     m = X.shape[1]
-    W = weight_matrix(X)
+    W = weight_matrix(X, sigma)
     for i in range(n):
         for j in range(m):
             L.append(W[i,j] * (f[i]-f[j])**2)
@@ -70,9 +70,9 @@ def unlabeled_part(f,l,u):
     return f_unlabeled  
 
 
-def weight_in_blocks(X, l, u):
+def weight_in_blocks(X, l, u, sigma):
     
-    W = weight_matrix(X)
+    W = weight_matrix(X, sigma)
     W_1 = W[0:l,0:l]
     W_2 = W[0:l,l:l+u]
     W_3 = W[l:l+u,0:l]
@@ -81,20 +81,20 @@ def weight_in_blocks(X, l, u):
     return W_1,W_2,W_3,W_4
 
 
-def diagonal_matrix(X):
+def diagonal_matrix(X, sigma):
     
     n = X.shape[0]
     d = []
-    W = weight_matrix(X)
+    W = weight_matrix(X, sigma)
     for i in range(n):
         s = W[i,:].sum()
         d.append(s)
     D = np.diag(d)
     return D
 
-def diagonal_in_blocks(X,l,u):
+def diagonal_in_blocks(X,l,u, sigma):
     
-    D = diagonal_matrix(X)
+    D = diagonal_matrix(X,sigma)
     D_1 = D[0:l,0:l]
     D_2 = D[0:l,l:l+u]
     D_3 = D[l:l+u,0:l]
@@ -103,35 +103,61 @@ def diagonal_in_blocks(X,l,u):
     return D_1,D_2,D_3,D_4
     
 
-def laplacian(X):
+def laplacian(X,sigma):
     
-    return diagonal_matrix(X) - weight_matrix(X)
+    return diagonal_matrix(X,sigma) - weight_matrix(X,sigma)
+
+def P_matrix(X, sigma):
+    
+    n = X.shape[0]
+    d = []
+    W = weight_matrix(X, sigma)
+    D = diagonal_matrix(X, sigma)
+    return np.linalg.solve(D,W)
+
+def P_matrix_in_blocks(X, l,u, sigma):
+    
+    D = P_matrix(X, sigma)
+    D_1 = D[0:l,0:l]
+    D_2 = D[0:l,l:l+u]
+    D_3 = D[l:l+u,0:l]
+    D_4 = D[l:l+u,l:l+u]
+    
+    return D_1,D_2,D_3,D_4
+
+def smoothed_P_matrix(X, eps, sigma):
+    
+    n = X.shape[0]
+    P = P_matrix(X,sigma)
+    U = np.zeros((n,n))
+    return eps * U + (1-eps) * P 
+
+def smoothed_P_matrix_in_blocks(X, l,u, eps, sigma):
+    
+    D = smoothed_P_matrix(X, eps, sigma)
+    D_1 = D[0:l,0:l]
+    D_2 = D[0:l,l:l+u]
+    D_3 = D[l:l+u,0:l]
+    D_4 = D[l:l+u,l:l+u]
+    
+    return D_1,D_2,D_3,D_4
     
 
-X = np.array([[1,1,1,1,1],[2,2,2,2,2],[3,3,3,3,3],[4,4,4,4,4]])
-l=2
-u=2
-y = [1,0,0,1]
-
-def harmonic_solution(X,y,l,u):
+def harmonic_solution(X,y,l,u,sigma):
     
-    W_b = weight_in_blocks(X,l,u)
-   
+    W_b = weight_in_blocks(X,l,u,sigma)
     f_labeled = []
     for i in range(l):
         f_labeled.append(y[i])
-    
-    temp = np.linalg.solve(diagonal_in_blocks(X,l,u)[3]-W_b[3],np.eye(u)) 
+    temp = np.linalg.solve(diagonal_in_blocks(X,l,u,sigma)[3]-W_b[3],np.eye(u)) 
     f_unlabeled = np.matmul(np.matmul(temp,W_b[2]), f_labeled)
     return f_labeled, f_unlabeled
 
 def create_sample(X,f,N,l,u,p):
     X_spl = np.zeros((N,p))
     f_spl = []
-    
-    # call the random function to choose the
-    # labeled data and check if all labeled
-    # data have not the same label
+    unlabeled = 1
+    increment = 0
     uniform = 1
     while uniform == 1 :
         i = 0
@@ -140,9 +166,6 @@ def create_sample(X,f,N,l,u,p):
             if (f[spl[i]]!=f[spl[0]]):
                 uniform = 0
             i+=1
-    
-    unlabeled = 1
-    increment = 0
     
     #remplir la partie labeled de X_spl
     for j in range(l):
