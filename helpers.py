@@ -1,15 +1,16 @@
 
+
 import numpy as np
 import random as rd
 
 def single_weight(X, i, j, sigma):
     
     # if X has size n x m
-    L = []
     m = X.shape[1]
+    S = 0
     for d in range(m):
-        L.append((X[i,d]-X[j,d])**2/sigma[d]**2)
-    S = np.sum(L)
+        s = sigma[d]**2
+        S+=(int(X[i,d])-int(X[j,d]))**2/s
     E = np.exp(-S)
     
     return E
@@ -194,3 +195,13 @@ def classifier(f_unlabeled,q):
         if q*f_unlabeled[i]/S > (1-q)*(1-f_unlabeled[i])/S:
             f_u_classified[i] = 1
     return f_u_classified
+
+def merge(f_labeled, f_unlabeled):
+    l=len(f_labeled)
+    u=len(f_unlabeled)
+    f=np.zeros(l+u)
+    for i in range(l):
+        f[i] = f_labeled[i]
+    for i in range(u):
+        f[l+i] = f_unlabeled[i]
+    return f
