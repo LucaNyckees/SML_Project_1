@@ -83,12 +83,13 @@ def compute_gradient(X,f,l,u,sigma,eps):
     return grad
 
 
-
-def gradient_descent(X,y,initial_sigma,max_iters,gamma,f,l,u,eps):
+def gradient_descent(X,initial_sigma,max_iters,gamma,f,l,u,eps):
     
     sigma = initial_sigma
     for n_iter in range(max_iters):
-        grad = compute_gradient(X,f,l,u,sigma,eps)
+        (f_labeled,f_unlabeled) = harmonic_solution(X,f,l,u,sigma)
+        f_harmonic = merge(f_labeled, f_unlabeled)
+        grad = compute_gradient(X,f_harmonic,l,u,sigma,eps)
         for i in range(X.shape[1]):    
             sigma[i] = sigma[i] - gamma * grad[i]
     return sigma
