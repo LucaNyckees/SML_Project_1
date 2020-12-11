@@ -1,11 +1,11 @@
 import numpy as np
-from magic_helpers import *
+from helpers import *
 
 
 def partial_deriv_w(X,i,j,sigma,d):
     
-    W = weight_matrix(X,sigma)
-    temp = 2* W[i,j] * (X[i,d]-X[j,d])**2
+   # W = weight_matrix(X,sigma)
+    temp = 2* single_weight(X, i, j, sigma) * (int(X[i,d])-int(X[j,d]))**2
     power = sigma[d]**3
     return temp / power
 
@@ -48,21 +48,21 @@ def partial_deriv_P_tilde_in_blocks(X,sigma,d,eps,l,u):
     return M_1,M_2,M_3,M_4
                               
       
-#quantity in expression (13)
-def derivative_vector(X,y,f,l,u,sigma,d,eps):
+#quantity in expression (13) df(u)/d(sigmad)
+def derivative_vector(X,f,l,u,sigma,d,eps):
     
-    P = smoothed_P_matrix_in_blocks(X, eps, sigma)
+    P = smoothed_P_matrix_in_blocks(X, l,u,eps, sigma)
     temp = np.linalg.solve(np.eye(u)-P[3],np.eye(u)) 
     a = np.matmul(partial_deriv_P_tilde_in_blocks(X,sigma,d,eps,l,u)[3],unlabeled_part(f,l,u))
     b = np.matmul(partial_deriv_P_tilde_in_blocks(X,sigma,d,eps,l,u)[2],labeled_part(f,l,u))
     temp = np.matmul(temp,a+b)
     return temp
     
-#quantity in expression (12)
-def compute_deriv(X,y,f,l,u,sigma,d,eps):
+#quantity in expression (12) dH/d(sigmad)
+def compute_deriv(X,f,l,u,sigma,d,eps):
     
     s = 0
-    v = derivative_vector(X,y,f,l,u,sigma,d,eps)
+    v = derivative_vector(X,f,l,u,sigma,d,eps)
     
     for i in range(u):
         s += np.log((1-f[l+i])/f[l+i]) * v[i]
@@ -71,45 +71,57 @@ def compute_deriv(X,y,f,l,u,sigma,d,eps):
     
 
 #quantities in expression (12) reunited in a vector
-def compute_gradient(X,y,f,l,u,sigma,eps):
+def compute_gradient(X,f,l,u,sigma,eps):
     
     m = X.shape[1]
     grad = []
     
     for d in range(m):
-        x = compute_deriv(X,y,f,l,u,sigma,d,eps)
+        x = compute_deriv(X,f,l,u,sigma,d,eps)
         grad.append(x)
         
     return grad
 
-# testing part
-X = np.array([[1,1,1,1,1],[2,2,2,2,2],[3,3,3,3,3],[4,4,4,4,4]])
-l=2
-u=2
-y = [1,0,0,1]
-f1 = harmonic_solution(X,y,l,u,sigma)[0]
-f2 = harmonic_solution(X,y,l,u,sigma)[1]
-f = np.hstack((f1,f2))
-sigma = []
-for i in range(X.shape[1]):
-    sigma.append(380)
-    
-#print(sigma[4]) 
-
-#print(partial_deriv_P_tilde(X,sigma,2,eps=0.1))
-print(compute_gradient(X,y,f,l,u,sigma,eps=0.1))
 
 
 def gradient_descent(X,y,initial_sigma,max_iters,gamma,f,l,u,eps):
     
     sigma = initial_sigma
     for n_iter in range(max_iters):
-        grad = compute_gradient(X,y,f,l,u,sigma,eps)
-        sigma = sigma - gamma * grad
+        grad = compute_gradient(X,f,l,u,sigma,eps)
+        for i in range(X.shape[1]):    
+            sigma[i] = sigma[i] - gamma * grad[i]
     return sigma
 
-#print(gradient_descent(X,y,sigma,20,0.01,f,l,u,0.1))
+def entropy(x):
+    Hx = -x*np.log(x) - (1-x)*np.log(1-x)
+    return Hx
 
+def mean_entropy(f_unlabeled):
+    u = len(f_unlabeled)
+    S=0
+    for i in range (u):
+        S+=entropy(f_unlabeled[i])
+    H = S/u
+    return H
+    
+def grid_search(X,f,l,u, start, stop):
+    
+    m = X.shape[1]
+    sigma =[]
+    for i in range(m):
+        sigma.append(start)
+    (f_labeled,f_unlabeled) = harmonic_solution(X, f, l, u, sigma)
+    temp = np.array([start, mean_entropy(f_unlabeled)])
+    for i in range(start, stop):
+        for j in range(m):
+            sigma[j] = i
+        (f_labeled,f_unlabeled) = harmonic_solution(X,f,l,u,sigma)
+        H = mean_entropy(f_unlabeled)        
+        if (H < temp[1]):
+            temp = (i,H)
+        sigma_min = temp[0]
+    return sigma_min
 
 
 
