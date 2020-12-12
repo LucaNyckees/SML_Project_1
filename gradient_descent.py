@@ -11,29 +11,28 @@ def partial_deriv_w(X,i,j,sigma,d):
 
     
 #quantity in expression (14)
-def partial_deriv_p(X,i,j,sigma,d):
-    
-    W = weight_matrix(X,sigma)
-    P = P_matrix(X,sigma)
+def partial_deriv_p(X,i,j,sigma,d,W,P):
+
     n = X.shape[0]
     S = 0
     Sum = 0
     for index in range(n):
         S += partial_deriv_w(X,i,index,sigma,d)
         Sum += W[i,index]
-
     result = partial_deriv_w(X,i,j,sigma,d) - P[i,j] * S
     return result / Sum
 
 
 def partial_deriv_P_tilde(X,sigma,d,eps):
     
+    W = weight_matrix(X,sigma)
+    P = P_matrix(X,sigma)
     n = X.shape[0]
     M = np.zeros((n,n))
+
     for i in range(n):
         for j in range(n):
-            M[i,j] = partial_deriv_p(X,i,j,sigma,d)
-    
+            M[i,j] = partial_deriv_p(X,i,j,sigma,d,W,P)
     return (1-eps) * M
 
 
@@ -49,21 +48,20 @@ def partial_deriv_P_tilde_in_blocks(X,sigma,d,eps,l,u):
                               
       
 #quantity in expression (13) df(u)/d(sigmad)
-def derivative_vector(X,f,l,u,sigma,d,eps):
+def derivative_vector(X,f,l,u,sigma,d,eps,temp):
     
-    P = smoothed_P_matrix_in_blocks(X, l,u,eps, sigma)
-    temp = np.linalg.solve(np.eye(u)-P[3],np.eye(u)) 
+    """P = smoothed_P_matrix_in_blocks(X, l,u,eps, sigma)
+    temp = np.linalg.solve(np.eye(u)-P[3],np.eye(u)) """
     a = np.matmul(partial_deriv_P_tilde_in_blocks(X,sigma,d,eps,l,u)[3],unlabeled_part(f,l,u))
     b = np.matmul(partial_deriv_P_tilde_in_blocks(X,sigma,d,eps,l,u)[2],labeled_part(f,l,u))
-    temp = np.matmul(temp,a+b)
-    return temp
+    v = np.matmul(temp,a+b)
+    return v
     
 #quantity in expression (12) dH/d(sigmad)
-def compute_deriv(X,f,l,u,sigma,d,eps):
+def compute_deriv(X,f,l,u,sigma,d,eps,temp):
     
     s = 0
-    v = derivative_vector(X,f,l,u,sigma,d,eps)
-    
+    v = derivative_vector(X,f,l,u,sigma,d,eps,temp)
     for i in range(u):
         s += np.log((1-f[l+i])/f[l+i]) * v[i]
     s = s/u
@@ -75,12 +73,14 @@ def compute_gradient(X,f,l,u,sigma,eps):
     
     m = X.shape[1]
     grad = []
-    
+    P_smoothed = smoothed_P_matrix_in_blocks(X, l,u,eps, sigma)
+    temp = np.linalg.solve(np.eye(u)-P_smoothed[3],np.eye(u)) 
     for d in range(m):
-        x = compute_deriv(X,f,l,u,sigma,d,eps)
+        x = compute_deriv(X,f,l,u,sigma,d,eps,temp)
         grad.append(x)
         
     return grad
+
 
 
 def gradient_descent(X,initial_sigma,max_iters,gamma,f,l,u,eps):
@@ -123,7 +123,6 @@ def grid_search(X,f,l,u, start, stop):
             temp = (i,H)
         sigma_min = temp[0]
     return sigma_min
-
 
 
 
