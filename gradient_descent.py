@@ -23,10 +23,8 @@ def partial_deriv_p(X,i,j,sigma,d,W,P):
     return result / Sum
 
 
-def partial_deriv_P_tilde(X,sigma,d,eps):
-    
-    W = weight_matrix(X,sigma)
-    P = P_matrix(X,sigma)
+def partial_deriv_P_tilde(X,sigma,d,eps,W,P):
+   
     n = X.shape[0]
     M = np.zeros((n,n))
 
@@ -36,9 +34,9 @@ def partial_deriv_P_tilde(X,sigma,d,eps):
     return (1-eps) * M
 
 
-def partial_deriv_P_tilde_in_blocks(X,sigma,d,eps,l,u):
+def partial_deriv_P_tilde_in_blocks(X,sigma,d,eps,l,u,W,P):
     
-    M = partial_deriv_P_tilde(X,sigma,d,eps)
+    M = partial_deriv_P_tilde(X,sigma,d,eps,W,P)
     M_1 = M[0:l,0:l]
     M_2 = M[0:l,l:l+u]
     M_3 = M[l:l+u,0:l]
@@ -48,20 +46,20 @@ def partial_deriv_P_tilde_in_blocks(X,sigma,d,eps,l,u):
                               
       
 #quantity in expression (13) df(u)/d(sigmad)
-def derivative_vector(X,f,l,u,sigma,d,eps,temp):
+def derivative_vector(X,f,l,u,sigma,d,eps,temp,W,P):
     
     """P = smoothed_P_matrix_in_blocks(X, l,u,eps, sigma)
     temp = np.linalg.solve(np.eye(u)-P[3],np.eye(u)) """
-    a = np.matmul(partial_deriv_P_tilde_in_blocks(X,sigma,d,eps,l,u)[3],unlabeled_part(f,l,u))
-    b = np.matmul(partial_deriv_P_tilde_in_blocks(X,sigma,d,eps,l,u)[2],labeled_part(f,l,u))
+    a = np.matmul(partial_deriv_P_tilde_in_blocks(X,sigma,d,eps,l,u,W,P)[3],unlabeled_part(f,l,u))
+    b = np.matmul(partial_deriv_P_tilde_in_blocks(X,sigma,d,eps,l,u,W,P)[2],labeled_part(f,l,u))
     v = np.matmul(temp,a+b)
     return v
     
 #quantity in expression (12) dH/d(sigmad)
-def compute_deriv(X,f,l,u,sigma,d,eps,temp):
+def compute_deriv(X,f,l,u,sigma,d,eps,temp,W,P):
     
     s = 0
-    v = derivative_vector(X,f,l,u,sigma,d,eps,temp)
+    v = derivative_vector(X,f,l,u,sigma,d,eps,temp,W,P)
     for i in range(u):
         s += np.log((1-f[l+i])/f[l+i]) * v[i]
     s = s/u
@@ -74,9 +72,11 @@ def compute_gradient(X,f,l,u,sigma,eps):
     m = X.shape[1]
     grad = []
     P_smoothed = smoothed_P_matrix_in_blocks(X, l,u,eps, sigma)
-    temp = np.linalg.solve(np.eye(u)-P_smoothed[3],np.eye(u)) 
+    temp = np.linalg.solve(np.eye(u)-P_smoothed[3],np.eye(u))
+    W = weight_matrix(X,sigma)
+    P = P_matrix(X,sigma)
     for d in range(m):
-        x = compute_deriv(X,f,l,u,sigma,d,eps,temp)
+        x = compute_deriv(X,f,l,u,sigma,d,eps,temp,W,P)
         grad.append(x)
         
     return grad
@@ -123,7 +123,6 @@ def grid_search(X,f,l,u, start, stop):
             temp = (i,H)
         sigma_min = temp[0]
     return sigma_min
-
 
 
 
