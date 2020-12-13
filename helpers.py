@@ -1,5 +1,3 @@
-
-
 import numpy as np
 import random as rd
 
@@ -9,7 +7,8 @@ def single_weight(X, i, j, sigma):
     m = X.shape[1]
     S = 0
     for d in range(m):
-        s = sigma[d]**2
+        s = sigma**2
+        #s = sigma[d]**2
         S+=(int(X[i,d])-int(X[j,d]))**2/s
     E = np.exp(-S)
     
