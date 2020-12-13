@@ -1,4 +1,3 @@
-
 import numpy as np
 from helpers import *
 from sklearn import linear_model
@@ -8,7 +7,7 @@ from data_processing import *
 from external_classifier import *
 from new_gradient_descent import *
 
-ok=GenerateData(1,2,10,8)
+ok=GenerateData(1,2,100,16)
 
 (X, f) = ok
 for i in range(len(f)):
@@ -18,23 +17,21 @@ X = np.array(X)
 
 S = 1
 # number of data
-N = 10
+N = 100
 # number of pixels for each data
-p = 64
-# number of labeled data (>=2)
-l = 2
-# number of unlabeled data
-u = N-l
+p = 256
 # CMN parameter
 q = 0.5
 # main hyperparameter    
-sigma = 380
+sigma = 528
     
+    
+#f = merge(harmonic_solution(X,f,l,u,sigma)[0],harmonic_solution(X,f,l,u,sigma)[1])
+
 # uncomment this section to see gradient descent.
 # Nota bene : gradients are very small here (10^-4), so to make a meaningful step towards a possible minimum, we
 # decide to take an order 10^5 stepsize (gamma), given that we work with values ranging from 1 to 1000.
 # any initial value (not returning a singular matrix error) from 1 to 1000 will lead to the value 528.232.
-# number of labeled data (>=2)
 """
 l = 20
 # number of unlabeled data
@@ -42,7 +39,6 @@ u = N-l
 f = merge(harmonic_solution(X,f,l,u,sigma)[0],harmonic_solution(X,f,l,u,sigma)[1])
 gradient_descent(X,600,300,100000,f,l,u,0.01)
 """
-#keep the previous lines in comment if objective is to run the code below (plotting accuracies)
 
 f_predicted = np.zeros((S,N))
 
@@ -71,5 +67,3 @@ for l in list_of_sizes:
 plt.plot(list_of_sizes, accuracy_cmn, list_of_sizes, accuracy_lr)
 plt.ylabel('accuracy')
 plt.xlabel('number of labeled images')
-
-
