@@ -5,7 +5,7 @@ from sklearn.linear_model import LogisticRegression
 from sklearn.metrics import accuracy_score
 from data_processing import *
 from external_classifier import *
-from new_gradient_descent import *
+from gradient_descent import *
 import matplotlib.pyplot as plt
 
 ok=GenerateData(1,2,100,16)
