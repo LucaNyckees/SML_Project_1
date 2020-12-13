@@ -46,8 +46,8 @@ gradient_descent(X,600,300,100000,f,l,u,0.01)
 
 f_predicted = np.zeros((S,N))
 
-# plotting graphs to compare accuracy of different methods according to
-# the cardinality of the labeled set (l).
+# plotting graphs to compare accuracy of different methods 
+# according to the cardinality of the labeled set (l).
 list_of_sizes = [5,10,20,30,40,50]
 accuracy_cmn = []
 accuracy_lr = []
@@ -62,12 +62,11 @@ for l in list_of_sizes:
         (X_spl[i], f_spl[i]) = create_sample(X,f,N,l,u,p)
         (f_spl_labeled[i], f_spl_unlabeled[i]) = harmonic_solution(X_spl[i], f_spl[i], l, u,sigma)
         f_u_classified[i] = classifier(f_spl_unlabeled[i],q)
-        f_predicted[i] = np.concatenate((f_spl_labeled[i],f_u_classified[i]))
-        accuracy_cmn.append((accuracy_score(f_spl[i], f_predicted[i])))
+        accuracy_cmn.append((accuracy_score(f_spl[i][l:l+u], f_u_classified[i])))
         logreg = LogisticRegression()
         logreg.fit(X_spl[i][0:l],f_spl[i][0:l])
-        y_pred = logreg.predict(X_spl[i][l:u])
-        accuracy_lr.append(accuracy_score(f_spl[i][l:u], y_pred))
+        y_pred = logreg.predict(X_spl[i][l:l+u])
+        accuracy_lr.append(accuracy_score(f_spl[i][l:l+u], y_pred))
 
 plt.plot(list_of_sizes, accuracy_cmn, list_of_sizes, accuracy_lr)
 plt.ylabel('accuracy')
