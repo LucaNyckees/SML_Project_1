@@ -77,13 +77,3 @@ def GenerateData(k,l,number,size):
     Data=[Input_Data, Output_Data]
 
     return Data
-
-""""
-ok_test=GenerateData(1,2,20,8)
-print(ok_test[0][0])
-
-ok_test2=GenerateDataforDisplay(1,2,20,8)
-print(ok_test2[0])
-DisplayData(ok_test2[0])
-"""
-
