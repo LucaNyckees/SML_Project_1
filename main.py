@@ -88,3 +88,53 @@ plt.plot(list_of_sizes, accuracy_ext, label='combined')
 plt.ylabel('accuracy')
 plt.xlabel('number of labeled images')
 plt.legend(loc='lower right')
+
+"""
+for l in list_of_sizes:
+    u = N - l
+    X_spl = np.zeros((S, N, p))
+    f_spl = np.zeros((S, N))
+    f_spl_labeled = np.zeros((S, l))
+    f_spl_unlabeled = np.zeros((S, u))
+    f_u_classified = np.zeros((S, u))
+    f_spl_labeled_ext = np.zeros((S, l))
+    f_spl_unlabeled_ext = np.zeros((S, u))
+    f_u_classified_ext = np.zeros((S, u))
+    for i in range(S):
+        (X_spl[i], f_spl[i]) = create_sample(X, f, N, l, u, p)
+
+        # harmonic solution
+        (f_spl_labeled[i], f_spl_unlabeled[i]) = harmonic_solution(X_spl[i], f_spl[i], l, u, sigma)
+        f_u_classified[i] = classifier(f_spl_unlabeled[i], q)
+        accuracy_cmn.append((accuracy_score(f_spl[i][l:l + u], f_u_classified[i])))
+
+        # k-nearest neighbors
+        # warning: k must be smaller than l
+        knn = KNeighborsClassifier(n_neighbors=8)
+        knn.fit(X_spl[i][0:l],f_spl[i][0:l])
+        y_pred = knn.predict(X_spl[i][l:l+u])
+        accuracy_lr.append(accuracy_score(f_spl[i][l:l + u], y_pred))
+
+        # external classifier (label propagation + k-nearest neighbors )
+        if y_pred[0]==1:
+            y_pred_continuous = knn.predict_proba(X_spl[i][l:l + u])[:, 1]
+        else:
+            y_pred_continuous= knn.predict_proba(X_spl[i][l:l+u])[:, 0]
+        eta = cross_valid_eta(X_spl[i],f_spl[i],l, u, sigma, y_pred,0.2)
+        (f_spl_labeled_ext[i], f_spl_unlabeled_ext[i]) = new_solution(X_spl[i], f_spl[i], l, u, sigma,y_pred, eta)
+
+        f_u_classified_ext[i] = classifier(f_spl_unlabeled_ext[i], q)
+        accuracy_ext.append(accuracy_score(f_spl[i][l:l + u], f_u_classified_ext[i]))
+# plotting
+fig = plt.figure()
+plt.plot(list_of_sizes, accuracy_cmn, label='label propagation')
+plt.plot(list_of_sizes, accuracy_lr, label='8NN method')
+plt.plot(list_of_sizes, accuracy_ext, label='combined')
+plt.ylabel('accuracy')
+plt.xlabel('number of labeled images')
+plt.legend(loc='lower right')
+plt.show()
+"""
+
+
+
