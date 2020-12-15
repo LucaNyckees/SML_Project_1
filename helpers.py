@@ -141,7 +141,15 @@ def smoothed_P_matrix_in_blocks(X, l,u, eps, sigma):
     D_4 = D[l:l+u,l:l+u]
     
     return D_1,D_2,D_3,D_4
-    
+
+def harmonic_solution_smoothed(X,y,l,u,sigma,eps):
+
+    f_labeled = []
+    for i in range(l):
+        f_labeled.append(y[i])
+    temp = np.linalg.solve(np.eye(u)-smoothed_P_matrix_in_blocks(X,l,u,eps,sigma)[3],np.eye(u)) 
+    f_unlabeled = np.matmul(np.matmul(temp,smoothed_P_matrix_in_blocks(X, l,u, eps, sigma)[2]), f_labeled)
+    return f_labeled, f_unlabeled        
 
 def harmonic_solution(X,y,l,u,sigma):
     
