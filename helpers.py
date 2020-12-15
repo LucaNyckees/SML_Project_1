@@ -220,3 +220,13 @@ def merge(f_labeled, f_unlabeled):
     for i in range(u):
         f[l+i] = f_unlabeled[i]
     return f
+
+def laplace_smoothing(f_labeled):
+    l=len(f_labeled)
+    n_1=0
+    for i in range(l):
+        if f_labeled[i]==1:
+            n_1=n_1+1
+    print(n_1)
+    q=(n_1+1)/(l+2)
+    return q
