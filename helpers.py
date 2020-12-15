@@ -191,7 +191,15 @@ def classifier(f_unlabeled,q):
     u = len(f_unlabeled)
     f_u_classified = np.zeros(u)
     for i in range(u):
-        if q*f_unlabeled[i]/S > (1-q)*(1-f_unlabeled[i])/S:
+        if q*f_unlabeled[i]/S > (1-q)*(1-f_unlabeled[i])/(u-S):
+            f_u_classified[i] = 1
+    return f_u_classified
+
+def classifier_thresold(f_unlabeled):
+    u = len(f_unlabeled)
+    f_u_classified=np.zeros(u)
+    for i in range(u):
+        if f_unlabeled[i] > 1/2:
             f_u_classified[i] = 1
     return f_u_classified
 
