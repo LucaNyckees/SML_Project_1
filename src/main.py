@@ -1,4 +1,3 @@
-
 from external_classifier import *
 from gradient_descent import *
 import numpy as np
@@ -26,8 +25,8 @@ N = 100
 # number of pixels for each data
 p = 256
 # CMN parameter
-#q = 0.5
-# main hyperparameter    
+# q = 0.5
+# main hyperparameter
 sigma = 528
 
 # f = merge(harmonic_solution(X,f,l,u,sigma)[0],harmonic_solution(X,f,l,u,sigma)[1])
@@ -46,10 +45,10 @@ gradient_descent(X,600,300,100000,f,l,u,0.01)
 
 f_predicted = np.zeros((S, N))
 
-# plotting graphs to compare accuracy of different methods 
+# plotting graphs to compare accuracy of different methods
 # according to the cardinality of the labeled set (l).
 list_of_sizes = [10, 15, 20, 25, 30, 35, 40, 45, 50]
-accuracy_thr=[]
+accuracy_thr = []
 accuracy_cmn = []
 accuracy_lr = []
 accuracy_ext = []
@@ -157,6 +156,3 @@ plt.xlabel('number of labeled images')
 plt.legend(loc='lower right')
 plt.show()
 """
-
-
-
