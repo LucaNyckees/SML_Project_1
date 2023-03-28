@@ -9,7 +9,7 @@ mnist = tf.keras.datasets.mnist  # 28x28 images of handwritten digits 0-9
 (x_train, y_train), (x_test, y_test) = mnist.load_data()
 
 
-def ResizeData(size: int, data: list) -> list:
+def resize_data(size: int, data: list) -> list:
     newdata = []
     for i in range(0, len(data)):
         resized_img = cv2.resize(data[i], (size, size))
@@ -18,7 +18,7 @@ def ResizeData(size: int, data: list) -> list:
     return newdata
 
 
-def TransformData(data: list) -> list:
+def transform_data(data: list) -> list:
     Transformed_Data = []
     for i in range(0, len(data)):
         local = list(itertools.chain(*data[i]))
@@ -27,7 +27,7 @@ def TransformData(data: list) -> list:
     return Transformed_Data
 
 
-def DisplayData(data: list) -> None:
+def display_data(data: list) -> None:
     fig = plt.figure(figsize=(8, 8))
     columns = round(math.sqrt(len(data))) + 1
     rows = round(math.sqrt(len(data))) + 1
@@ -41,36 +41,36 @@ def DisplayData(data: list) -> None:
     plt.show()
 
 
-def GenerateDataforDisplay(k, l, number, size) -> list:
-    Input_Data = []
-    Output_Data = []
+def generate_data_for_display(k, l, number, size) -> list:
+    input_data = []
+    output_data = []
     i = 0
     j = 0
     while i < number:
         if y_train[j] == k or y_train[j] == l:
-            Input_Data.append(x_train[j])
-            Output_Data.append(y_train[j])
+            input_data.append(x_train[j])
+            output_data.append(y_train[j])
             i = i + 1
         j = j + 1
-    Input_Data = ResizeData(size, Input_Data)
-    Data = [Input_Data, Output_Data]
+    input_data = resize_data(size, input_data)
+    Data = [input_data, output_data]
 
     return Data
 
 
-def GenerateData(k, l, number, size) -> list:
-    Input_Data = []
-    Output_Data = []
+def generate_data(k, l, number, size) -> list:
+    input_data = []
+    output_data = []
     i = 0
     j = 0
     while i < number:
         if y_train[j] == k or y_train[j] == l:
-            Input_Data.append(x_train[j])
-            Output_Data.append(y_train[j])
+            input_data.append(x_train[j])
+            output_data.append(y_train[j])
             i = i + 1
         j = j + 1
-    Input_Data = ResizeData(size, Input_Data)
-    Input_Data = TransformData(Input_Data)
-    Data = [Input_Data, Output_Data]
+    input_data = resize_data(size, input_data)
+    input_data = transform_data(input_data)
+    data = [input_data, output_data]
 
-    return Data
+    return data

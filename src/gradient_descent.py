@@ -83,49 +83,12 @@ def compute_gradient(X, f, l, u, sigma, eps):
     return x
 
 
-"""def gradient_descent(X,initial_sigma,max_iters,gamma,f,l,u,eps):
-    
-    sigma = initial_sigma
-    for n_iter in range(max_iters):
-        (f_labeled,f_unlabeled) = harmonic_solution(X,f,l,u,sigma)
-        f_harmonic = merge(f_labeled, f_unlabeled)
-        grad = compute_gradient(X,f_harmonic,l,u,sigma,eps)
-        
-        sigma = sigma - gamma * grad
-        print(sigma)
-    return sigma
-"""
-
-
 def gradient_descent(X, initial_sigma, max_iters, gamma, f, l, u, eps):
     sigma = initial_sigma
     for n_iter in range(max_iters):
         grad = compute_gradient(X, f, l, u, sigma, eps)
-        print(sigma)
         sigma = sigma - gamma * grad
-
-    print(sigma)
     return sigma
-
-
-"""def grid_search(X,f,l,u, start, stop):
-    
-    m = X.shape[1]
-    sigma =[]
-    for i in range(m):
-        sigma.append(start)
-    (f_labeled,f_unlabeled) = harmonic_solution(X, f, l, u, sigma)
-    temp = np.array([start, mean_entropy(f_unlabeled)])
-    for i in range(start, stop):
-        for j in range(m):
-            sigma[j] = i
-        (f_labeled,f_unlabeled) = harmonic_solution(X,f,l,u,sigma)
-        H = mean_entropy(f_unlabeled)        
-        if (H < temp[1]):
-            temp = (i,H)
-        sigma_min = temp[0]
-    return sigma_min
-"""
 
 
 def grid_search(X, f, l, u, init, final):
