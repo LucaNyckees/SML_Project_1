@@ -1,16 +1,12 @@
+import numpy as np
+import plotly.graph_objects as go
+from data_processing import *
 from external_classifier import *
 from gradient_descent import *
-import numpy as np
 from helpers import *
-from sklearn import linear_model
 from sklearn.linear_model import LogisticRegression
 from sklearn.metrics import accuracy_score
-from data_processing import *
-from sklearn.neighbors import KNeighborsClassifier
-from cross_validation import cross_valid_eta
-import matplotlib.pyplot as plt
 from tqdm import tqdm
-import plotly.graph_objects as go
 
 
 def simulation(parameters: dict, data: list, sizes: list[int]) -> go.Figure:
@@ -77,6 +73,7 @@ def simulation(parameters: dict, data: list, sizes: list[int]) -> go.Figure:
     fig.add_trace(go.Scatter(x=sizes, y=accuracy_cmn, name="label propagation"))
     fig.add_trace(go.Scatter(x=sizes, y=accuracy_lr, name="logistic regression"))
     fig.add_trace(go.Scatter(x=sizes, y=accuracy_ext, name="combined"))
+
     fig.add_trace(go.Scatter(x=sizes, y=accuracy_thr, name="thresold method"))
     fig.update_layout(legend_title_text="Method")
     fig.update_layout(
