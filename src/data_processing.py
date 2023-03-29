@@ -2,7 +2,6 @@ import tensorflow as tf
 import math
 import matplotlib.pyplot as plt
 import cv2
-import numpy as np
 import itertools
 
 mnist = tf.keras.datasets.mnist  # 28x28 images of handwritten digits 0-9

@@ -1,4 +1,7 @@
-from external_classifier import *
+from helpers import classifier
+from external_classifier import new_solution
+from sklearn.metrics import accuracy_score
+import numpy as np
 
 
 def cross_valid_eta(X, y, l, u, sigma, h_u_continuous, increment) -> float:
