@@ -129,6 +129,11 @@ venv.bak/
 .dmypy.json
 dmypy.json
 
+# ruff
+.ruff_cache/
+.ruff.json
+ruff.json
+
 # Pyre type checker
 .pyre/
 
