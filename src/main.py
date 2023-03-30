@@ -29,49 +29,48 @@ def simulation(parameters: dict, data: list, sizes: list[int]) -> go.Figure:
     accuracy_lr = []
     accuracy_ext = []
 
-    for size in tqdm(sizes):
-        l = size
-        u = N - l
+    for L in tqdm(sizes):
+        u = N - L
         X_spl = np.zeros((S, N, p))
         f_spl = np.zeros((S, N))
-        f_spl_labeled = np.zeros((S, l))
+        f_spl_labeled = np.zeros((S, L))
         f_spl_unlabeled = np.zeros((S, u))
         f_u_classified = np.zeros((S, u))
         f_u_thr = np.zeros((S, u))
-        f_spl_labeled_ext = np.zeros((S, l))
+        f_spl_labeled_ext = np.zeros((S, L))
         f_spl_unlabeled_ext = np.zeros((S, u))
         f_u_classified_ext = np.zeros((S, u))
         for i in range(S):
-            (X_spl[i], f_spl[i]) = create_sample(X, f, N, l, u, p)
-            q = laplace_smoothing(f_spl[i][0:l])
+            (X_spl[i], f_spl[i]) = create_sample(X, f, N, L, u, p)
+            q = laplace_smoothing(f_spl[i][0:L])
 
             # harmonic solution
             (f_spl_labeled[i], f_spl_unlabeled[i]) = harmonic_solution(
-                X_spl[i], f_spl[i], l, u, sigma
+                X_spl[i], f_spl[i], L, u, sigma
             )
             f_u_classified[i] = classifier(f_spl_unlabeled[i], q)
             accuracy_cmn.append(
-                (accuracy_score(f_spl[i][l : l + u], f_u_classified[i]))
+                (accuracy_score(f_spl[i][L : L + u], f_u_classified[i]))
             )
 
             # thresold method
             f_u_thr[i] = classifier_thresold(f_spl_unlabeled[i])
-            accuracy_thr.append((accuracy_score(f_spl[i][l : l + u], f_u_thr[i])))
+            accuracy_thr.append((accuracy_score(f_spl[i][L : L + u], f_u_thr[i])))
 
             # logistic regression
             logreg = LogisticRegression()
-            logreg.fit(X_spl[i][0:l], f_spl[i][0:l])
-            y_pred = logreg.predict(X_spl[i][l : l + u])
-            accuracy_lr.append(accuracy_score(f_spl[i][l : l + u], y_pred))
+            logreg.fit(X_spl[i][0:L], f_spl[i][0:L])
+            y_pred = logreg.predict(X_spl[i][L : L + u])
+            accuracy_lr.append(accuracy_score(f_spl[i][L : L + u], y_pred))
 
             # external classifier (label propagation + logistic regression)
-            y_pred_continuous = logreg.predict_proba(X_spl[i][l : l + u])[:, 1]
+            y_pred_continuous = logreg.predict_proba(X_spl[i][L : L + u])[:, 1]
             (f_spl_labeled_ext[i], f_spl_unlabeled_ext[i]) = new_solution(
-                X_spl[i], f_spl[i], l, u, sigma, y_pred_continuous, eta=0.1
+                X_spl[i], f_spl[i], L, u, sigma, y_pred_continuous, eta=0.1
             )
             f_u_classified_ext[i] = classifier(f_spl_unlabeled_ext[i], q)
             accuracy_ext.append(
-                accuracy_score(f_spl[i][l : l + u], f_u_classified_ext[i])
+                accuracy_score(f_spl[i][L : L + u], f_u_classified_ext[i])
             )
 
     fig = go.Figure()

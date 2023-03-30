@@ -13,7 +13,6 @@ def resize_data(size: int, data: list) -> list:
     for i in range(0, len(data)):
         resized_img = cv2.resize(data[i], (size, size))
         newdata.append(resized_img)
-
     return newdata
 
 
@@ -22,7 +21,6 @@ def transform_data(data: list) -> list:
     for i in range(0, len(data)):
         local = list(itertools.chain(*data[i]))
         Transformed_Data.append(local)
-
     return Transformed_Data
 
 
@@ -36,11 +34,10 @@ def display_data(data: list) -> None:
         plt.xticks([])
         plt.yticks([])
         plt.imshow(img, cmap=plt.cm.binary)
-
     plt.show()
 
 
-def generate_data_for_display(k, l, number, size) -> list:
+def generate_data_for_display(k: int, l: int, number, size) -> list:
     input_data = []
     output_data = []
     i = 0
@@ -52,12 +49,11 @@ def generate_data_for_display(k, l, number, size) -> list:
             i = i + 1
         j = j + 1
     input_data = resize_data(size, input_data)
-    Data = [input_data, output_data]
+    data = [input_data, output_data]
+    return data
 
-    return Data
 
-
-def generate_data(k, l, number, size) -> list:
+def generate_data(k: int, l: int, number, size) -> list:
     input_data = []
     output_data = []
     i = 0
@@ -71,5 +67,4 @@ def generate_data(k, l, number, size) -> list:
     input_data = resize_data(size, input_data)
     input_data = transform_data(input_data)
     data = [input_data, output_data]
-
     return data
