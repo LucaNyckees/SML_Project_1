@@ -16,6 +16,8 @@
 
 The goal of this project is to implement a graph label propagation method to study and classify image data.
 
+<img width="450" alt="figure" src="https://github.com/LucaNyckees/graph-label-propagation/blob/main/figures/accuracies1.png">
+
 ---
 
 ## Virtual environment

@@ -72,17 +72,21 @@ def simulation(parameters: dict, data: list, sizes: list[int]) -> go.Figure:
             accuracy_ext.append(
                 accuracy_score(f_spl[i][L : L + u], f_u_classified_ext[i])
             )
-
     fig = go.Figure()
-    fig.add_trace(go.Scatter(x=sizes, y=accuracy_cmn, name="label propagation"))
-    fig.add_trace(go.Scatter(x=sizes, y=accuracy_lr, name="logistic regression"))
-    fig.add_trace(go.Scatter(x=sizes, y=accuracy_ext, name="combined"))
-    fig.add_trace(go.Scatter(x=sizes, y=accuracy_thr, name="thresold method"))
-    fig.update_layout(legend_title_text="Method")
+    methods = [
+        "label propagation",
+        "logistic regression",
+        "logistic regression",
+        "thresold method",
+    ]
+    for acc, method in zip(
+        [accuracy_cmn, accuracy_lr, accuracy_ext, accuracy_thr], methods
+    ):
+        fig.add_trace(go.Scatter(x=sizes, y=acc, name=method))
     fig.update_layout(
+        legend_title_text="Method",
         title="Compared method accuracies",
         xaxis_title="number of labeled images",
         yaxis_title="method accuracy",
     )
-
     return fig
